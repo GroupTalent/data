@@ -450,6 +450,8 @@ createdState.states.uncommitted.reopen({
 
 createdState.states.uncommitted.reopen({
   rollback: function(manager) {
+    var record = get(manager, 'record');
+    record.clearRelationships();
     this._super(manager);
     manager.transitionTo('deleted.saved');
   }
