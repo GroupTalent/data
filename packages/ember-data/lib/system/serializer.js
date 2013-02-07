@@ -204,7 +204,7 @@ DS.Serializer = Ember.Object.extend({
   extractRecordRepresentation: function(loader, type, json, shouldSideload) {
     var mapping = this.mappingForType(type);
     var embeddedData, prematerialized = {}, reference;
-
+    
     if (shouldSideload) {
       reference = loader.sideload(type, json);
     } else {
