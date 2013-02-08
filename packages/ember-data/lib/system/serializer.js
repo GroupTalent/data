@@ -204,7 +204,7 @@ DS.Serializer = Ember.Object.extend({
   extractRecordRepresentation: function(loader, type, json, shouldSideload) {
     var mapping = this.mappingForType(type);
     var embeddedData, prematerialized = {}, reference;
-
+    
     if (shouldSideload) {
       reference = loader.sideload(type, json);
     } else {
@@ -910,10 +910,10 @@ DS.Serializer = Ember.Object.extend({
   registerEnumTransform: function(type, objects) {
     var transform = {
       deserialize: function(deserialized) {
-        return objects.objectAt(deserialized);
+        return Ember.A(objects).objectAt(deserialized);
       },
       serialize: function(serialized) {
-        return objects.indexOf(serialized);
+        return Ember.EnumerableUtils.indexOf(objects, serialized);
       },
       values: objects
     };
