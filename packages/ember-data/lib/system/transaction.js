@@ -142,6 +142,15 @@ DS.Transaction = Ember.Object.extend({
     // Make `add` idempotent
     if (recordTransaction === this) { return; }
 
+    var store = get(this, 'store');
+    var adapter = get(store, '_adapter');
+    var serializer = get(adapter, 'serializer');
+    serializer.eachEmbeddedRecord(record, function(embeddedRecord, embeddedType) {
+      if (embeddedType === 'load') { return; }
+
+      this.add(embeddedRecord);
+    }, this);
+
     // XXX it should be possible to move a dirty transaction from the default transaction
 
     // we could probably make this work if someone has a valid use case. Do you?
