@@ -2,6 +2,8 @@ var store, Adapter, adapter;
 var Post, Comment, User, App;
 var attr = DS.attr;
 
+var get = Ember.get, set = Ember.set;
+
 module("Embedded Saving", {
   setup: function() {
     App = Ember.Namespace.create({ name: "App" });
@@ -33,6 +35,35 @@ module("Embedded Saving", {
     store.destroy();
     App.destroy();
   }
+});
+
+asyncTest("Modifying the parent in a different transaction", function() {
+  adapter.ajax = function(url, type, hash) {
+    equal(url, '/posts/1');
+    equal(type, 'PUT');
+    equal(hash.data.post.comments.length, 1);
+
+    setTimeout(function() {
+      hash.data.post.comments[0].title = 'wtf';
+      hash.success.call(hash.context, hash.data);
+      start();
+    });
+  };
+
+  adapter.load(store, Post, {
+    id: 1,
+    title: 'I cannot wait for Ember.Component to be implemented.',
+    comments: [{id: 2, title: 'yes!'}]
+  });
+
+  var post = store.find(Post, 1);
+
+  var t = store.transaction();
+  t.add(post);
+
+  set(post, 'title', "Hopefully soon.");
+
+  t.commit();
 });
 
 asyncTest("Adding a new embedded record to an unsaved record: Both records use the same POST request.", function() {
