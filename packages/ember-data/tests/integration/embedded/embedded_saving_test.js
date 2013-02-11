@@ -2,6 +2,8 @@ var store, Adapter, adapter;
 var Post, Comment, User, App;
 var attr = DS.attr;
 
+/*global $*/
+
 module("Embedded Saving", {
   setup: function() {
     App = Ember.Namespace.create({ name: "App" });
