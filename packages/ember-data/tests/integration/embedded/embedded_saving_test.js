@@ -3,6 +3,7 @@ var Post, Comment, User, App;
 var attr = DS.attr;
 
 var get = Ember.get, set = Ember.set;
+/*global $*/
 
 module("Embedded Saving", {
   setup: function() {
@@ -72,10 +73,14 @@ asyncTest("Adding a new embedded record to an unsaved record: Both records use t
     equal(type, 'POST');
     equal(hash.data.post.comments.length, 1);
 
+    var promise = $.Deferred();
     setTimeout(function() {
       hash.success.call(hash.context);
       start();
+      promise.resolve();
     });
+
+    return promise;
   };
 
   var transaction = store.transaction();
