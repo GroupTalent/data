@@ -252,7 +252,8 @@ DS.RESTAdapter = DS.Adapter.extend({
   },
 
   shouldPreserveDirtyRecords: function(relationship) {
-    return relationship.kind === 'hasMany';
+    var isEmbedded = !!get(this, 'serializer').embeddedType(relationship.parentType, relationship.key);
+    return !isEmbedded && relationship.kind === 'hasMany';
   },
 
   dirtyRecordsForRecordChange: function(dirtySet, record) {
