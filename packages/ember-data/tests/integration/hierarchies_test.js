@@ -56,18 +56,29 @@ module("DS.RESTAdapter Hierarchies", {
       return "App.Vote";
     };
 
+	Follower = DS.Model.extend();
+	Follower.toString = function() {
+      return "App.Follower";
+    };
+
     Comment.reopen({
       body: DS.attr('string'),
       post: DS.belongsTo(Post),
       comments: DS.hasMany(Comment),
       comment: DS.belongsTo(Comment),
-      votes: DS.hasMany(Vote)
+      votes: DS.hasMany(Vote),
+	  followers: DS.hasMany(Follower)
     });
 
     Post.reopen({
       title: DS.attr('string'),
       comments: DS.hasMany(Comment),
       tags: DS.hasMany(Tag)
+    });
+
+	Follower.reopen({
+      name: DS.attr('string'),
+      comments: DS.hasMany(Comment)
     });
 
     Adapter.map(Post, {
@@ -254,6 +265,30 @@ asyncTest("deleting child and updating parent", function () {
     equal(get(post, 'comments.length'), 0, 'post should not have any comments');
   });
 });
+
+
+//PJ
+asyncTest("creating manyToMany association", function () {
+  var comment = store.createRecord(Comment, {body: 'A great comment'});
+  var follower = get(comment, 'followers').createRecord({name: 'John'});
+
+  console.log("Followers length: " + comment.get('followers.firstObject.name'));
+  console.log("Comments length: " + follower.get('comments.firstObject.body'));
+ 
+  ajaxResults = {
+    'POST:/comments': function() { return dataForCreate(comment); },
+    'POST:/followers': function() { return dataForCreate(follower); }
+  };
+
+  store.commit();
+
+  waitForPromises(function() {
+    equal(get(comment, 'followers.firstObject'), follower, "follower should be set");
+    equal(get(follower, 'comments.firstObject'), comment, "comment should be set");
+  });
+});
+
+
 
 asyncTest("deleting child and parent", function () {
   adapter.load(store, Post, {id: 1, title: 'Who needs ACID??', comments: [2]});
