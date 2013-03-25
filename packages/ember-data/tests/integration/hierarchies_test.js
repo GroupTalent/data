@@ -328,7 +328,7 @@ asyncTest("creating embedded parent->child hierarchy", function() {
   waitForPromises(function() {
     deepEqual(ajaxCalls, ['POST:/posts'], 'should only have one ajax request');
     equal(get(tag, 'post'), post, "post should be set");
-    //equal(get(post, 'tags.firstObject'), tag, "post should have tag as a child");
+    equal(get(post, 'tags.firstObject'), tag, "post should have tag as a child");
     equal(get(post, 'tags.length'), 1, "post should only have 1 tag");
   });
 });
