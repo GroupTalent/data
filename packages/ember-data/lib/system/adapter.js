@@ -222,6 +222,7 @@ DS.Adapter = Ember.Object.extend(DS._Mappable, {
     var record = parentRecord.get(name);
     var root = get(this, 'serializer').rootForType(result.type);
     var raw = {};
+    raw[root] = result.raw;
     if(get(record, 'isNew')) {
       this.didCreateRecord(store, record.constructor, record, raw);
     } else {
