@@ -26,7 +26,7 @@ Node.prototype = {
 
   isRoot: function() {
     return this.parents.every(function(parent) {
-      return !get(parent, 'record.isDirty');
+      return !get(parent, 'record.isDirty') && parent.isRoot();
     });
   }
 };
@@ -206,9 +206,10 @@ DS.RESTAdapter = DS.Adapter.extend({
       var childNode = referenceToNode.get(r.childReference);
       var parentNode = referenceToNode.get(r.parentReference);
 
-      // in non-embedded case, child delete requests should
-      // come before the parent request
-      if(r.changeType === 'remove' && adapter.shouldSave(childNode.record)) {
+      // In the non-embedded case, there is a potential request race
+      // condition where the parent returns the id of a deleted child.
+      // To solve for this we make the child delete complete first.
+      if(r.changeType === 'remove' && adapter.shouldSave(childNode.record) && adapter.shouldSave(parentNode.record)) {
         childNode.addChild(parentNode);
       } else {
         parentNode.addChild(childNode);
