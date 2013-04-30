@@ -288,7 +288,11 @@ asyncTest("creating embedded parent->child hierarchy", function() {
   var tag = get(post, 'tags').createRecord({name: 'current'});
 
   ajaxResults = {
-    'POST:/posts': function() { return dataForCreate(post); }
+    'POST:/posts': function() {
+      var data = dataForCreate(post);
+      data.post.tags[0].post_id = 1;
+      return data;
+    }
   };
 
   store.commit();
