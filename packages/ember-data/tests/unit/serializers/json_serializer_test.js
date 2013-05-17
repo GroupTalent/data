@@ -5,6 +5,7 @@ var MockModel = Ember.Object.extend({
     this.materializedAttributes = {};
     this.hasMany = {};
     this.belongsTo = {};
+    this.data = {belongsTo: {}};
   },
 
   eachAttribute: function(callback, binding) {

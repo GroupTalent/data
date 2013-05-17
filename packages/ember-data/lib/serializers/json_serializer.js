@@ -118,6 +118,7 @@ DS.JSONSerializer = DS.Serializer.extend({
         value = null,
         includeType = (relationship.options && relationship.options.polymorphic),
         embeddedChild,
+        childReference,
         child,
         id;
 
@@ -128,11 +129,17 @@ DS.JSONSerializer = DS.Serializer.extend({
 
       hash[key] = value;
     } else {
-      child = get(record, relationship.key);
-      id = get(child, 'id');
+      // ideally we wouldnt like to materialize
+      if(childReference = record.get('data.belongsTo')[relationship.key]) {
+        id = childReference.id;
+      } else {
+        child = get(record, relationship.key);
+        id = get(child, 'id');
+      }
 
       if (relationship.options && relationship.options.polymorphic && !Ember.isNone(id)) {
-        this.addBelongsToPolymorphic(hash, key, id, child.constructor);
+        type = childReference && childReference.type || child.constructor;
+        this.addBelongsToPolymorphic(hash, key, id, type);
       } else {
         hash[key] = id === undefined ? null : this.serializeId(id);
       }
